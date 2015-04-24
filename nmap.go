@@ -26,6 +26,7 @@ const usage = `
 func buildProject(run *nmap.NmapRun, projectId string) (*lair.Project, error) {
 	project := &lair.Project{}
 	project.Id = projectId
+	project.Tool = TOOL
 	project.Commands = append(project.Commands, lair.Command{Tool: TOOL, Command: run.Args})
 
 	// Loop through all hosts
