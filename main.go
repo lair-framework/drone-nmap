@@ -1,13 +1,16 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/url"
 	"os"
 	"strings"
 
+	"github.com/lair-framework/api-server/client"
 	"github.com/lair-framework/go-lair"
 	"github.com/lair-framework/go-nmap"
 )
@@ -125,12 +128,37 @@ func main() {
 	default:
 		log.Fatal("Fatal: Missing required argument")
 	}
-	log.Println(lairPID, filename, *insecureSSL, *forcePorts, *tags)
+	u, err := url.Parse(lairURL)
+	if err != nil {
+		log.Fatalf("Fatal: Error parsing LAIR_API_SERVER URL. Error %s", err.Error())
+	}
+	if u.User == nil {
+		log.Fatal("Missing username and/or password")
+	}
+	user := u.User.Username()
+	pass, _ := u.User.Password()
+	if user == "" || pass == "" {
+		log.Fatal("Fatal: Missing username and/or password")
+	}
+	c, err := client.New(&client.COptions{
+		User:               user,
+		Password:           pass,
+		Host:               u.Host,
+		Scheme:             u.Scheme,
+		InsecureSkipVerify: *insecureSSL,
+	})
+
+	if err != nil {
+		log.Fatalf("Fatal: Error setting up client: Error %s", err.Error())
+	}
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Fatalf("Fatal: Could not open file. Error %s", err.Error())
 	}
-	hostTags := strings.Split(*tags, ",")
+	hostTags := []string{}
+	if *tags != "" {
+		hostTags = strings.Split(*tags, ",")
+	}
 	nmapRun, err := nmap.Parse(data)
 	if err != nil {
 		log.Fatal(err)
@@ -139,5 +167,21 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(project)
+	res, err := c.ImportProject(&client.DOptions{ForcePorts: *forcePorts}, project)
+	if err != nil {
+		log.Fatalf("Fatal: Unable to import project. Error %s", err)
+	}
+	defer res.Body.Close()
+	droneRes := &client.Response{}
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := json.Unmarshal(body, droneRes); err != nil {
+		log.Fatal(err)
+	}
+	if droneRes.Status == "Error" {
+		log.Fatalf("Fatal: Import failed. Error %s", droneRes.Message)
+	}
+	log.Println("Success: Operation completed successfully")
 }
