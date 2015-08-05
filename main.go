@@ -149,9 +149,8 @@ func main() {
 		Scheme:             u.Scheme,
 		InsecureSkipVerify: *insecureSSL,
 	})
-
 	if err != nil {
-		log.Fatalf("Fatal: Error setting up client: Error %s", err.Error())
+		log.Fatalf("Fatal: Error setting up client. Error %s", err.Error())
 	}
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -163,24 +162,24 @@ func main() {
 	}
 	nmapRun, err := nmap.Parse(data)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Fatal: Error parsing nmap. Error %s", err.Error())
 	}
 	project, err := buildProject(nmapRun, lairPID, hostTags)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Fatal: Error building project. Error %s", err.Error())
 	}
 	res, err := c.ImportProject(&client.DOptions{ForcePorts: *forcePorts}, project)
 	if err != nil {
-		log.Fatalf("Fatal: Unable to import project. Error %s", err)
+		log.Fatalf("Fatal: Unable to import project. Error %s", err.Error())
 	}
 	defer res.Body.Close()
 	droneRes := &client.Response{}
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Fatal: Error %s", err.Error())
 	}
 	if err := json.Unmarshal(body, droneRes); err != nil {
-		log.Fatal(err)
+		log.Fatalf("Fatal: Could not unmarshal JSON. Error %s", err.Error())
 	}
 	if droneRes.Status == "Error" {
 		log.Fatalf("Fatal: Import failed. Error %s", droneRes.Message)
