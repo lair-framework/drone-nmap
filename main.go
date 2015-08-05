@@ -20,6 +20,8 @@ const (
 	tool     = "nmap"
 	osWeight = 50
 	usage    = `
+Parses an nmap XML file into a lair project.
+
 Usage:
   drone-nmap <id> <filename>
   export LAIR_ID=<id>; drone-nmap <filename>
@@ -133,7 +135,7 @@ func main() {
 		log.Fatalf("Fatal: Error parsing LAIR_API_SERVER URL. Error %s", err.Error())
 	}
 	if u.User == nil {
-		log.Fatal("Missing username and/or password")
+		log.Fatal("Fatal: Missing username and/or password")
 	}
 	user := u.User.Username()
 	pass, _ := u.User.Password()
