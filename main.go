@@ -23,8 +23,8 @@ const (
 Parses an nmap XML file into a lair project.
 
 Usage:
-  drone-nmap <id> <filename>
-  export LAIR_ID=<id>; drone-nmap <filename>
+  drone-nmap [options] <id> <filename>
+  export LAIR_ID=<id>; drone-nmap [options] <filename>
 Options:
   -v              show version and exit
   -h              show usage and exit
