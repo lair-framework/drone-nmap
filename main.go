@@ -30,6 +30,7 @@ Options:
   -h              show usage and exit
   -k              allow insecure SSL connections
   -force-ports    disable data protection in the API server for excessive ports
+  -limit-hosts    only import hosts that have listening ports
   -tags           a comma separated list of tags to add to every host that is imported
 `
 )
@@ -106,6 +107,7 @@ func main() {
 	showVersion := flag.Bool("v", false, "")
 	insecureSSL := flag.Bool("k", false, "")
 	forcePorts := flag.Bool("force-ports", false, "")
+	limitHosts := flag.Bool("limit-hosts", false, "")
 	tags := flag.String("tags", "", "")
 	flag.Usage = func() {
 		fmt.Println(usage)
@@ -168,7 +170,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Fatal: Error building project. Error %s", err.Error())
 	}
-	res, err := c.ImportProject(&client.DOptions{ForcePorts: *forcePorts}, project)
+	res, err := c.ImportProject(&client.DOptions{ForcePorts: *forcePorts, LimitHosts: *limitHosts}, project)
 	if err != nil {
 		log.Fatalf("Fatal: Unable to import project. Error %s", err.Error())
 	}
