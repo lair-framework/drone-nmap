@@ -122,6 +122,9 @@ func main() {
 		log.Fatal("Fatal: Missing LAIR_API_SERVER environment variable")
 	}
 	lairPID := os.Getenv("LAIR_ID")
+	if lairPID == "" {
+		log.Fatal("Fatal: Missing LAIR_ID")
+	}
 	var filename string
 	switch len(flag.Args()) {
 	case 2:
