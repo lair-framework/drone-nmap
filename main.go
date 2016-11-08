@@ -88,11 +88,11 @@ func buildProject(run *nmap.NmapRun, projectID string, tags []string) (*lair.Pro
 			host.Services = append(host.Services, service)
 		}
 
-		if len(h.Os.OsMatch) > 0 {
+		if len(h.Os.OsMatches) > 0 {
 			os := lair.OS{}
 			os.Tool = tool
 			os.Weight = osWeight
-			os.Fingerprint = h.Os.OsMatch[0].Name
+			os.Fingerprint = h.Os.OsMatches[0].Name
 			host.OS = os
 		}
 
